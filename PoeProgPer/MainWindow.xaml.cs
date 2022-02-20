@@ -39,16 +39,25 @@ namespace PoeProgPer
         {
             if (AvaileableListBox.SelectedItem != null && this.FitnessText.Text != "")
             {
+                Skill skill = vm.Availeable[this.AvaileableListBox.SelectedIndex];
                 try
-                {
-                    Skill skill = vm.Availeable[this.AvaileableListBox.SelectedIndex];
+                {                   
                     vm.Availeable.Remove(skill);
                     skill.Fitness = int.Parse(this.FitnessText.Text);
                     vm.Chosen.Add(skill);
                 }
-                catch (Exception)
+                catch (Exception excep)
                 {
+                    MessageBox.Show("There was an exception : "+ excep.ToString());
+                    if (!vm.Availeable.Contains(skill)){ 
+                        vm.Availeable.Add(skill);
+                        vm.Chosen.Remove(skill);
+                    }
                 }
+            }
+            else
+            {
+                MessageBox.Show("Please Select a Skill Type and make sure that there is a fitness associated with it");
             }
         }
 
@@ -70,49 +79,107 @@ namespace PoeProgPer
 
         }
 
-        private void DoWork_Click(object sender, RoutedEventArgs e)
+        private void MakeTheTree()
         {
+            sk = new SkillTree(vm.GraphSize, 4);
+            string msg = "";
+            for (int i = 0; i < sk.TheGraph.Vertice.Length && i < 50; i++)
+            {
+                msg += i + 1 + "(" + sk.skillist.ElementAt(i).ToString() + "): ";
+                foreach (var item in sk.TheGraph.Vertice[i])
+                {
+                    msg += item + 1 + "-";
+                }
+                msg += "\n";
+            }
+            this.Graph_Content.Text = msg;
+            MessageBox.Show("Created the following Graph: \n" + msg);
+        }
+
+        private void init() {
             foreach (var item in vm.Availeable)
             {
                 vm.Chosen.Add(item);
             }
-            MakeTheTree();
-            Utillek.Hozzarendeles(sk.skillist, vm.Chosen.ToList());
-            List<int> E = new List<int>();
-            List<int> opt = new List<int>();
-            List<int> E1 = new List<int>();
-            List<int> opt1 = new List<int>();
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-            int szamlal = sk.TheGraph.stPointCounter;
-            List<int>[] optimals = new List<int>[szamlal];
-            
-            for (int i = 0; i < szamlal; i++)
+            Utils.Hozzarendeles(sk.skillist, vm.Chosen.ToList());
+            vm.E = new List<int>();
+            vm.opt = new List<int>();
+            vm.E1 = new List<int>();
+            vm.opt1 = new List<int>();
+            vm.sw = new Stopwatch();
+
+            vm.szamlal = sk.TheGraph.stPointCounter;
+            vm.optimals = new List<int>[vm.szamlal];
+
+            for (int i = 0; i < vm.szamlal; i++)
             {
-                optimals[i] = new List<int>();
+                vm.optimals[i] = new List<int>();
             }
-            
-            Task[] tasks = new Task[szamlal];
+            vm.skillPoints = int.Parse(this.SkillPoints.Text);
+            vm.tasks = new Task[vm.szamlal];
+        }
+
+        private async void DoWork_Click(object sender, RoutedEventArgs e)
+        {            
+            init();
+            vm.tasks = new Task[vm.szamlal];
             int j = 0;
-            while( j < szamlal)
+            int josag = 0;
+            vm.sw.Start();
+            while ( j < vm.szamlal)
             {
                 int l = j;
-                tasks[l] = (Task.Factory.StartNew(() => Utillek.BackTrack(l, ref sk.TheGraph.Vertice, 10, E, ref optimals[l], ref sk.skillist, 0), TaskCreationOptions.LongRunning));
+                vm.tasks[l] = (Task.Factory.StartNew(() => Utils.BackTrack(l, ref sk.TheGraph.Vertice, vm.skillPoints, vm.E, ref vm.optimals[l], ref sk.skillist, ref josag), TaskCreationOptions.LongRunning));
                 j++;
             }
+            await Task.WhenAll(vm.tasks);
+            vm.sw.Stop();
+            createResult();
+           
+           /*
+            Task.WaitAll(vm.tasks);
+            vm.sw.Stop();
+            createResult();
+            */
+        }        
 
-            //a következő kódsorral lehet tesztelni, hogy egyébként mennyi idő alatt futna le párhuzamosítás nélkül 2 kezdőpont esetén a program
-            //tasks[0] = (Task.Factory.StartNew(()=>Utillek.BackTrack(0, ref sk.TheGraph.Vertice, 15, E, ref optimals[0], ref sk.skillist,0), TaskCreationOptions.LongRunning));
-            //tasks[1] = (Task.Factory.StartNew(() => Utillek.BackTrack(1, ref sk.TheGraph.Vertice, 15, E1, ref optimals[1], ref sk.skillist,0), TaskCreationOptions.LongRunning));
+        private void DoWorkNo_Click(object sender, RoutedEventArgs e)
+        {
+            init();
+            int josag = 0;
+            vm.sw.Start();
+            vm.tasks = new Task[1];
+            for (int j = 0; j < vm.szamlal; j++)
+            {
+                int l = j;
+                vm.tasks[0] = (Task.Factory.StartNew(() => Utils.BackTrack(l, ref sk.TheGraph.Vertice, vm.skillPoints, vm.E, ref vm.optimals[l], ref sk.skillist, ref josag), TaskCreationOptions.LongRunning));
+                //Task.WaitAll(vm.tasks);
+                Task.WaitAll(vm.tasks);
+            }
+            vm.sw.Stop();
+            createResult();
+        }
 
+        private void CreateGraph_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                vm.GraphSize = int.Parse(this.GraphSizeText.Text);
+                MakeTheTree();
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Please give a number as a graph size");
+            }
+        }
 
-            Task.WaitAll(tasks);
-            sw.Stop();
+        private void createResult()
+        {
             List<int> best = new List<int>();
             int totalbest = 0;
-            foreach (var item in optimals)
+            foreach (var item in vm.optimals)
             {
-                int k = Utillek.Josag(item, ref sk.skillist);
+                int k = Utils.Goodness(item, ref sk.skillist);
                 if (k > totalbest)
                 {
                     totalbest = k;
@@ -122,30 +189,39 @@ namespace PoeProgPer
             string kimenet = "";
             foreach (var item in best)
             {
-                kimenet += item + " ";
+                kimenet += item + 1 + " ";
             }
-            MessageBox.Show(sw.Elapsed.ToString() + "\n" + kimenet,totalbest.ToString());
-            
+            MessageBox.Show(vm.sw.Elapsed.ToString() + "\n" + kimenet, totalbest.ToString());
+            this.Last_run.Content = vm.sw.Elapsed.ToString() + "\n" + kimenet;
+            vm.Availeable.Clear();
+            foreach (var item in vm.Chosen)
+            {
+                item.Fitness = 0;
+                vm.Availeable.Add(item);
+            }
+            vm.Chosen.Clear();
+            sk.resetskillList();
         }
 
-        private void MakeTheTree()
-        {
-           
-            sk = new SkillTree(20, 4);
-            List<int> Megoldas = new List<int>();
-            List<int> Optimalis = new List<int>();
-        }
-
-       
     }
 
     public class ViewModel
     {
         public static ViewModel vm;
-       public  BindingList<Skill> Availeable;
+        public  BindingList<Skill> Availeable;
         public BindingList<Skill> Chosen;
+        public int GraphSize;
+        public List<int> E;
+        public List<int> opt;
+        public List<int> E1;
+        public List<int> opt1;
+        public Stopwatch sw;
+        public List<int>[] optimals;
+        public Task[] tasks;
+        public int szamlal;
+        public int skillPoints;
 
-        public ViewModel()
+    public ViewModel()
         {
             InitAvaileable();
         }

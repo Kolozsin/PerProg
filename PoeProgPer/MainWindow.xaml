@@ -5,14 +5,24 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PoeProgPer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="720" Width="1080">
     <Grid>
-        <ListBox Name="AvaileableListBox" HorizontalAlignment="Left" Height="246" Margin="42,60,0,0" VerticalAlignment="Top" Width="166"/>
-        <ListBox Name="ChosenListBox" HorizontalAlignment="Left" Height="194" Margin="280,112,0,0" VerticalAlignment="Top" Width="287"/>
-        <Button Name="Add" Content="Add" HorizontalAlignment="Left" Margin="371,56,0,0" VerticalAlignment="Top" Width="75" Click="Add_Click"/>
-        <TextBox Name="FitnessText" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="64" Margin="280,57,0,0" RenderTransformOrigin="-0.008,0.543"/>
-        <Button Name="Remove" Content="Remove" HorizontalAlignment="Left" Margin="592,156,0,0" VerticalAlignment="Top" Width="74" Click="Remove_Click"/>
-        <Button Name="DoWork" Content="Do Work" HorizontalAlignment="Left" Margin="670,56,0,0" VerticalAlignment="Top" Width="74" Click="DoWork_Click" />
+        <ListBox Name="AvaileableListBox" HorizontalAlignment="Left" Height="357" Margin="42,96,0,0" VerticalAlignment="Top" Width="166"/>
+        <ListBox Name="ChosenListBox" HorizontalAlignment="Left" Height="357" Margin="346,96,0,0" VerticalAlignment="Top" Width="287" MouseDoubleClick="Remove_Click"/>
+        <Button Name="Add" Content="Add -&gt;" HorizontalAlignment="Left" Margin="230,124,0,0" VerticalAlignment="Top" Width="100" Click="Add_Click" Height="44"/>
+        <TextBox Name="FitnessText" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="45" Margin="285,96,0,0" RenderTransformOrigin="-0.008,0.543"/>
+        <Button Name="Remove" Content="&lt;- Remove" HorizontalAlignment="Left" Margin="230,173,0,0" VerticalAlignment="Top" Width="100" Click="Remove_Click" Height="44" HorizontalContentAlignment="Center"/>
+        <TextBox Name="GraphSizeText" HorizontalAlignment="Left" Height="20" TextWrapping="Wrap" VerticalAlignment="Top" Width="63" Margin="346,23,0,0" RenderTransformOrigin="-0.008,0.543"/>
+        <Button Name="CreateGraph" Content="Create Graph" HorizontalAlignment="Left" Margin="439,20,0,0" VerticalAlignment="Top" Width="170" Click="CreateGraph_Click" />
+        <Button Name="DoWork" Content="Do Work Multiple Task" HorizontalAlignment="Left" Margin="627,20,0,0" VerticalAlignment="Top" Width="146" Click="DoWork_Click" />
+        <!-- <Button Name="DoWorkSimp" Content="Do Work Single Task" HorizontalAlignment="Left" Margin="795,20,0,0" VerticalAlignment="Top" Width="146" Click="DoWork_Click" />  -->
+        <Button Name="DoWorkNo" Content="Do Work No Task" HorizontalAlignment="Left" Margin="627,45,0,0" VerticalAlignment="Top" Width="145" Click="DoWorkNo_Click" />
+        <Label Content="Fitness :" HorizontalAlignment="Left" Margin="229,95,0,0" VerticalAlignment="Top" Width="51"/>
+        <Label Content="Graph size :" HorizontalAlignment="Left" Margin="254,20,0,0" VerticalAlignment="Top" Width="76"/>
+        <TextBox Name ="Graph_Content" Text="" HorizontalAlignment="Left" Margin="675,96,0,0" VerticalAlignment="Top" Width="343" Height="357" IsReadOnly="True" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible"/>
+        <Label Name="Last_run" Content="" HorizontalAlignment="Left" Margin="42,471,0,0" VerticalAlignment="Top" Width="591" Height="86"/>
+        <TextBox x:Name="SkillPoints" HorizontalAlignment="Left" Height="20" TextWrapping="Wrap" VerticalAlignment="Top" Width="63" Margin="346,55,0,0" RenderTransformOrigin="-0.008,0.543"/>
+        <Label Content="Points :" HorizontalAlignment="Left" Margin="254,55,0,0" VerticalAlignment="Top" Width="76"/>
 
     </Grid>
 </Window>

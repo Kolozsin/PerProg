@@ -23,7 +23,13 @@ namespace PoeProgPer
             }
             for (int i = starter; i < size; i++)
             {
-                skillist.Add(new Skill(0, Utillek.rnd.Next(1, Enum.GetNames(typeof(SkillType)).Length)));
+                skillist.Add(new Skill(0, Utils.rnd.Next(1, Enum.GetNames(typeof(SkillType)).Length)));
+            }
+        }
+        public void resetskillList() {
+            foreach (var item in skillist)
+            {
+                item.Fitness = 0;
             }
         }
     }
